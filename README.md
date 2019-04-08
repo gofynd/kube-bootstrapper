@@ -211,9 +211,6 @@ See also the tutorial at [int128/kubernetes-dashboard-proxy](https://github.com/
 #### 4-5. Working with managed services
 
 Terraform creates the security group `allow-from-nodes.hello.k8s.local` which allows access from the Kubernetes nodes.
-You can attach the security group to managed services such as RDS or Elasticsearch.
-
-See also [tf_managed_services.tf](tf_managed_services.tf).
 
 
 ## Manage the cluster
@@ -274,9 +271,6 @@ Cluster | EBS for PVs | gp2 | $0.1/GB
 Cluster | ALB | - | free
 Cluster | Route53 Hosted Zone | - | $0.5
 Cluster | S3  | - | free
-Managed | EFS | General Purpose up to 5GB | free
-Managed | RDS | t2.micro gp2 20GB | free
-Managed | Elasticsearch | t2.small gp2 10GB | free
 
 The cluster name must be a domain name in order to reduce an ELB for masters.
 
