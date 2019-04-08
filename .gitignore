@@ -1,0 +1,12 @@
+# Binary
+/.bin
+
+# Environment specific
+/.env
+/.sshkey
+/.sshkey.pub
+/.kubeconfig
+
+.terraform
+
+/.idea/
