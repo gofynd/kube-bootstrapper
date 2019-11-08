@@ -381,6 +381,54 @@ See also the tutorial at [int128/kubernetes-dashboard-proxy](https://github.com/
 
 Terraform creates the security group `allow-from-nodes.hello.k8s.local` which allows access from the Kubernetes nodes.
 
+### 5. Addons
+
+For extra addons to enhance the stability and functionality of the cluster, please refer the `addons` folder. 
+
+Currently available addons are listed below. 
+
+#### 5-1. Cluster Autoscaler (CA)
+
+TLDR; Automatically scale number of nodes based on load. Requires [metrics-server](https://github.com/kubernetes-incubator/metrics-server) if used with HPA. 
+
+To check if metrics-server is installed, run the following command.
+
+```bash
+kubectl top pods
+kubectl top nodes
+```
+
+If the commands :point_up: return CPU and memory utilization, you have metrics server installed!
+
+##### Quickstart
+
+```bash
+chmod a+x ./addons/autoscaling.sh
+./addons/autoscaling.sh
+```
+
+Cluster Autoscaler scales the *number of nodes* available in an Instance Group, based on `maxSize` and `minSize`. 
+
+- `minSize`  is the minimum number of nodes that will be available even when the cluster is not at load. 
+- `maxSize` is the maximum number of nodes the Cluster Autoscaler can request for at times of peak load. (This will be the reason your AWS bills go off the roof or stay in check).
+
+> Cluster Autoscaler kicks in when; new pods are created **AND** no node has space (CPU/Memory available) to accommodate the newly created pod. 
+
+CA works best with kubernetes deployments that have HPA(Horizontal Pod Autosaler) enabled. 
+
+With HPA enabled, if a deployment increases its number of replicas when at high load, CA automatically requests and provisions new nodes to schedule the newly created pods. 
+
+**Beware**: Although CA might take just a few seconds to respond to pods pending scheduling, **it** **may take upto 10-15 minutes** for the new node to actually join the cluster and become ready to be scheduled. So there is a chance for a minor downtime when scaling up (it autorecovers quite quickly).
+
+When the surge/load reduces, the number of pods automatically goes down(with an HPA); the CA also takes care of removing underutilized nodes. 
+
+**T2.medium/t3.medium/T-series nodes NotReady after CA**
+
+T-series instances have CPU burst credits which allows the **CPU to use up to twice its specified resources** of that instance type for short bursts of time. All T-series nodes get a set amount of CPU credit every hour, and loose CPU burst credits when CPU utilization exceeds above the allowed 100%.  
+
+Autoscaling ensures all nodes are used to their maximum potential; but that could mean using the CPU gets used upto 100%.  Since the instance is allowed to cross beyond the 100% threshold, 
+
+They tend to exhaust their burst credits and all nodes in the cluster end up in a `NotReady` state.
 
 ## Manage the cluster
 
@@ -481,7 +529,6 @@ spec:
   subnets:
   - us-west-2a
 ```
-
 
 ## Contribution
 
